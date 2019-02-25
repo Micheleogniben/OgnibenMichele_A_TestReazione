@@ -45,26 +45,22 @@ void setup() {
 }
 
 void loop() {
-                                //  estraggo i nuovi tempi
+  //  estraggo i nuovi tempi
   tRandom1 = random(1000, 5000);
   tRandom2 = random(1000, 5000);
-                                              //  button 1
+  
+  //  button 1                                           
   while (digitalRead(buttonStart) == LOW) {};
   lcd.clear();
   
-  //spegniLed((esitoVerde && esitoRosso), tRandom1, ledTest);             //  button 2
+  //  button 2         
+  digitalWrite(esitoVerde && esitoRosso, LOW);                            
+  ris1 = conteggioTempo(tRandom1, ledTest, buttonLed, 0, ledTest);  
   
-  digitalWrite(esitoVerde && esitoRosso, LOW);
-  delay(tRandom1);
-  digitalWrite(ledTest, HIGH);
-  ris1 = conteggioTempo(buttonLed, 0);
+  //  button 3         
+  ris2 = conteggioTempo(tRandom2, buzzer, buttonBuzzer, 1, buzzer);
   
-  digitalWrite(ledTest, LOW);
-  delay(tRandom2);
-  digitalWrite(buzzer, HIGH);                         //  button 3
-  
-  ris2 = conteggioTempo(buttonBuzzer, 1);
-  digitalWrite(buzzer, LOW);
+  //  led RGB
   if (ris1 <= prova1 && ris2 <= prova2){
     digitalWrite(esitoVerde, HIGH);
   }else{
@@ -72,19 +68,20 @@ void loop() {
   }
 }
 
-void spegniLed(int led, int tempo, int ledDaAccendere){
-  digitalWrite(led, LOW);
+int conteggioTempo(int led, int tempo, int ledDaAccendere, int button, int linea){
+  //  aspetto il tempo random ed accendo il led / buzzer
   delay(tempo);
   digitalWrite(ledDaAccendere, HIGH);
-}
-
-int conteggioTempo(int button, int linea){
+  //  while che calcola il tempo di reazione
   int ris = 0;
   while (digitalRead(button) == LOW){
     ris++;
     delay(1);
   }
-    lcd.setCursor(0, linea);
-    lcd.print(ris);
+  //  stampo il risultato e spengo il led / buzzer
+  digitalWrite(led, LOW);
+  lcd.setCursor(0, linea);
+  String stampo = ris + " millisec.";
+  lcd.print(stampo);
   return ris;
 }
