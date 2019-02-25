@@ -1,7 +1,7 @@
             //  librerie
 #include <LiquidCrystal.h>;
 #include "pitches.h";
-LiquidCrystal lcd(12, 11, 5, 4, 3, 2);            
+LiquidCrystal lcd(13, 12, 11, 10, 9, 8);
             
             //  input
 int buttonStart;
@@ -13,8 +13,6 @@ int esitoRosso;
 int esitoVerde;
 int buzzer;
             //  variabili
-int tRandom1;
-int tRandom2;
 int ris1;
 int ris2;
 int prova1;
@@ -24,13 +22,13 @@ void setup() {
                     //  inizio dello schermo lcd
   lcd.begin(16, 2);
                     //  assegnazione variabili
-  buttonStart   = 8;
-  buttonLed     = 9;
-  buttonBuzzer  = 10;
-  ledTest       = 6;
-  esitoRosso    = 1;
-  esitoVerde    = 0;
-  buzzer        = 13;
+  buttonStart   = 7;
+  buttonLed     = 6;
+  buttonBuzzer  = 5;
+  ledTest       = 4;
+  esitoRosso    = 3;
+  esitoVerde    = 2;
+  buzzer        = 1;
   prova1        = 500;
   prova2        = 500;
                               //  input
@@ -38,27 +36,23 @@ void setup() {
   pinMode(buttonLed,    INPUT);
   pinMode(buttonBuzzer, INPUT);
                               //  output
-  pinMode(ledTest,  OUTPUT);
+  pinMode(ledTest,    OUTPUT);
   pinMode(esitoRosso, OUTPUT);
   pinMode(esitoVerde, OUTPUT);
-  pinMode(buzzer,   OUTPUT);
+  pinMode(buzzer,     OUTPUT);
 }
 
 void loop() {
-  //  estraggo i nuovi tempi
-  tRandom1 = random(1000, 5000);
-  tRandom2 = random(1000, 5000);
-  
   //  button 1                                           
   while (digitalRead(buttonStart) == LOW) {};
   lcd.clear();
+  digitalWrite(esitoVerde && esitoRosso, LOW);       
   
-  //  button 2         
-  digitalWrite(esitoVerde && esitoRosso, LOW);                            
-  ris1 = conteggioTempo(tRandom1, ledTest, buttonLed, 0, ledTest);  
+  //  button 2                              
+  ris1 = conteggioTempo(ledTest, buttonLed, 0, ledTest);  
   
   //  button 3         
-  ris2 = conteggioTempo(tRandom2, buzzer, buttonBuzzer, 1, buzzer);
+  ris2 = conteggioTempo(buzzer, buttonBuzzer, 1, buzzer);
   
   //  led RGB
   if (ris1 <= prova1 && ris2 <= prova2){
@@ -68,10 +62,10 @@ void loop() {
   }
 }
 
-int conteggioTempo(int led, int tempo, int ledDaAccendere, int button, int linea){
+int conteggioTempo(int pinAcceso, int button, int linea, int pinSpento){
   //  aspetto il tempo random ed accendo il led / buzzer
-  delay(tempo);
-  digitalWrite(ledDaAccendere, HIGH);
+  delay(random(1000, 5000));
+  digitalWrite(pinAcceso, HIGH);
   //  while che calcola il tempo di reazione
   int ris = 0;
   while (digitalRead(button) == LOW){
@@ -79,7 +73,7 @@ int conteggioTempo(int led, int tempo, int ledDaAccendere, int button, int linea
     delay(1);
   }
   //  stampo il risultato e spengo il led / buzzer
-  digitalWrite(led, LOW);
+  digitalWrite(pinSpento, LOW);
   lcd.setCursor(0, linea);
   String stampo = ris + " millisec.";
   lcd.print(stampo);
