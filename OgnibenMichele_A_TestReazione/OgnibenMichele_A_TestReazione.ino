@@ -1,16 +1,16 @@
             //  librerie
 #include <LiquidCrystal.h>;
 #include "pitches.h";
-LiquidCrystal lcd(13, 12, 11, 10, 9, 8);
+LiquidCrystal lcd(8, 9, 10, 11, 12, 13);
             
             //  input
-int buttonStart;
-int buttonLed;
-int buttonBuzzer;
+int btn_start;
+int btn_led;
+int btn_buzzer;
             //  output
-int ledTest;
-int esitoRosso;
-int esitoVerde;
+int led_blu;
+int led_rosso;
+int led_verde;
 int buzzer;
             //  variabili
 int ris1;
@@ -22,60 +22,54 @@ void setup() {
                     //  inizio dello schermo lcd
   lcd.begin(16, 2);
                     //  assegnazione variabili
-  buttonStart   = 7;
-  buttonLed     = 6;
-  buttonBuzzer  = 5;
-  ledTest       = 4;
-  esitoRosso    = 3;
-  esitoVerde    = 2;
-  buzzer        = 1;
+  btn_start   = 7;
+  btn_led     = 6;
+  btn_buzzer  = 5;
+  buzzer        = 4;
+  led_blu       = 3;
+  led_rosso    = 2;
+  led_verde    = 1;
   prova1        = 500;
   prova2        = 500;
                               //  input
-  pinMode(buttonStart,  INPUT);
-  pinMode(buttonLed,    INPUT);
-  pinMode(buttonBuzzer, INPUT);
+  pinMode(btn_start,  INPUT);
+  pinMode(btn_led,    INPUT);
+  pinMode(btn_buzzer, INPUT);
                               //  output
-  pinMode(ledTest,    OUTPUT);
-  pinMode(esitoRosso, OUTPUT);
-  pinMode(esitoVerde, OUTPUT);
+  pinMode(led_blu,    OUTPUT);
+  pinMode(led_rosso,  OUTPUT);
+  pinMode(led_verde,  OUTPUT);
   pinMode(buzzer,     OUTPUT);
 }
 
 void loop() {
   //  button 1                                           
-  while (digitalRead(buttonStart) == LOW) {};
+  while (digitalRead(btn_start) == LOW) {};
   lcd.clear();
-  digitalWrite(esitoVerde && esitoRosso, LOW);       
+  digitalWrite(led_verde, LOW);
+  digitalWrite(led_rosso, LOW);       
+                           
+  ris1 = conteggioTempo(led_blu, btn_led, 0, led_blu);  
+     
+  ris2 = conteggioTempo(buzzer, btn_buzzer, 1, buzzer);
   
-  //  button 2                              
-  ris1 = conteggioTempo(ledTest, buttonLed, 0, ledTest);  
-  
-  //  button 3         
-  ris2 = conteggioTempo(buzzer, buttonBuzzer, 1, buzzer);
-  
-  //  led RGB
   if (ris1 <= prova1 && ris2 <= prova2){
-    digitalWrite(esitoVerde, HIGH);
+    digitalWrite(led_verde, HIGH);
   }else{
-    digitalWrite(esitoRosso, HIGH);
+    digitalWrite(led_rosso, HIGH);
   }
 }
 
 int conteggioTempo(int pinAcceso, int button, int linea, int pinSpento){
-  //  aspetto il tempo random ed accendo il led / buzzer
-  delay(random(1000, 5000));
+  delay(random(1000, 5000));                                                    //  aspetto il tempo random ed accendo il led / buzzer
   digitalWrite(pinAcceso, HIGH);
-  //  while che calcola il tempo di reazione
   int ris = 0;
-  while (digitalRead(button) == LOW){
+  while (digitalRead(button) == LOW){                                           //  while che calcola il tempo di reazione aumentando di 1 ogni millisecondo
     ris++;
     delay(1);
   }
-  //  stampo il risultato e spengo il led / buzzer
-  digitalWrite(pinSpento, LOW);
+  digitalWrite(pinSpento, LOW);                                                 //  stampo il risultato e spengo il led / buzzer
   lcd.setCursor(0, linea);
-  String stampo = ris + " millisec.";
-  lcd.print(stampo);
+  lcd.print(ris);
   return ris;
 }
