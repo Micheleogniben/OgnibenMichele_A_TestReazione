@@ -40,15 +40,14 @@ void setup() {
 }
 
 void loop() {
-  while (digitalRead(btn_start) == LOW) {};
-  lcd.clear();
+  while (digitalRead(btn_start) == LOW) {};     //  non inizierà nulla fino a che non verrà premuto il bottone
   digitalWrite(led_verde, LOW);
-  digitalWrite(led_rosso, LOW);       
-                           
-  ris1 = conteggioTempo(led_blu, btn_led, 0);  
-     
+  digitalWrite(led_rosso, LOW);
+  lcd.clear();
+                                                //  metodi per il calcolo del tempo di reazione per led e buzzer
+  ris1 = conteggioTempo(led_blu, btn_led, 0);
   ris2 = conteggioTempo(beep, btn_beep, 1);
-  
+                                                //  led esito positivo/negativo
   if (ris1 <= prova1 && ris2 <= prova2){
     digitalWrite(led_verde, HIGH);
   }else{
@@ -66,6 +65,7 @@ int conteggioTempo(int pin, int button, int linea){
   }
   digitalWrite(pin, LOW);                                                       //  stampo il risultato e spengo il led / buzzer
   lcd.setCursor(0, linea);
-  lcd.print(ris);
+  String s = "ms";
+  lcd.print(ris + s);
   return ris;
 }
