@@ -18,6 +18,7 @@ int prova2;
 
 void setup() {
   lcd.begin(16, 2);
+  lcd.print("Inizia");
 
   btn_start  = 7;
   btn_led    = 6;
@@ -44,9 +45,10 @@ void loop() {
   digitalWrite(led_verde, LOW);
   digitalWrite(led_rosso, LOW);
   lcd.clear();
+  lcd.print("Test iniziato");
                                                 //  metodi per il calcolo del tempo di reazione per led e buzzer
-  ris1 = conteggioTempo(led_blu, btn_led, 0);
-  ris2 = conteggioTempo(beep, btn_beep, 1);
+  ris1 = conteggioTempo(led_blu, btn_led,  "Test iniziato",  "Led: ");
+  ris2 = conteggioTempo(beep,    btn_beep, "Test terminato", "Suono: ");
                                                 //  led esito positivo/negativo
   if (ris1 <= prova1 && ris2 <= prova2){
     digitalWrite(led_verde, HIGH);
@@ -55,17 +57,18 @@ void loop() {
   }
 }
 
-int conteggioTempo(int pin, int button, int linea){
-  delay(random(1000, 5000));                                                    //  aspetto il tempo random ed accendo il led / buzzer
+int conteggioTempo(int pin, int button, String frase, String test){
+  delay(random(1000, 5000));                    //  aspetto il tempo random ed accendo il led / buzzer
   digitalWrite(pin, HIGH);
   int ris = 0;
-  while (digitalRead(button) == LOW){                                           //  while che calcola il tempo di reazione aumentando di 1 ogni millisecondo
+  while (digitalRead(button) == LOW){           //  while che calcola il tempo di reazione aumentando di 1 ogni millisecondo
     ris++;
     delay(1);
   }
-  digitalWrite(pin, LOW);                                                       //  stampo il risultato e spengo il led / buzzer
-  lcd.setCursor(0, linea);
-  String s = "ms";
-  lcd.print(ris + s);
+  lcd.clear();
+  lcd.print(frase);
+  lcd.setCursor(0, 1);
+  lcd.print(test + String(ris) + "ms");
+  digitalWrite(pin, LOW);                       //  stampo il risultato e spengo il led / buzzer
   return ris;
 }
