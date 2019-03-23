@@ -13,22 +13,24 @@ int beep;
             //  variabili
 int ris1;
 int ris2;
-int prova1;
-int prova2;
+int tempo_max;
+int led_esito;
 
 void setup() {
-  lcd.begin(16, 2);
-
-  btn_start  = 7;
+  lcd.begin(16, 2); 
+                    //  pin
+  led_blu    = 1;
+  beep       = 2;
+  led_rosso  = 3;   //  porta analogica per l'effetto dissolvenza
+  btn_start  = 4;
+  led_verde  = 5;   //  porta analogica per l'effetto dissolvenza
   btn_led    = 6;
-  btn_beep   = 5;
-  beep       = 4;
-  led_blu    = 3;
-  led_rosso  = 2;
-  led_verde  = 1;
-  prova1     = 500;
-  prova2     = 500;
-
+  btn_beep   = 7;
+                    //  variabili
+  tempo_max  = 500;
+  ris1       = -1;
+  ris2       = -1;
+  
   pinMode(btn_start,  INPUT);
   pinMode(btn_led,    INPUT);
   pinMode(btn_beep,   INPUT);
@@ -41,36 +43,55 @@ void setup() {
 
 void loop() {
   
-  lcd.print("Inizia test");
-  digitalWrite(led_verde, LOW);
-  digitalWrite(led_rosso, LOW);
-  
   while (digitalRead(btn_start) == LOW) {};     //  non inizierà nulla fino a che non verrà premuto il bottone
                                                 //  metodi per il calcolo del tempo di reazione per led e buzzer
+  digitalWrite(led_verde, LOW);
+  digitalWrite(led_rosso, LOW);
   lcd.clear();
+  
   ris1 = conteggioTempo(led_blu, btn_led,  0, "Led: ");
-  ris2 = conteggioTempo(beep,    btn_beep, 1, "Suono: ");
-                                                //  led esito positivo/negativo
-  if (ris1 <= prova1 && ris2 <= prova2){
-    digitalWrite(led_verde, HIGH);
+  
+  if (ris1 < 100){                              //  primo test non valido perchè l'utente ha "barato"
+    lcd.clear();
+    lcd.print("Test non valido");
+    led_esito = led_rosso;
   }else{
-    digitalWrite(led_rosso, HIGH);
+    ris2 = conteggioTempo(beep, btn_beep, 1, "Suono: ");
+    if (ris2 < 100){                            //  secondo test non valido perchè l'utente ha "barato"
+      lcd.clear();
+      lcd.print("Test non valido");
+      led_esito = led_rosso;
+    }else{
+      if (ris1 <= tempo_max && ris2 <= tempo_max){
+        led_esito = led_verde;                                //  test passato     => Led Verde
+      }else{
+        led_esito = led_rosso;                                //  test non passato => Led Rosso
+      }
+    }
   }
-
-  delay(3000);
-  lcd.clear();
+  
+  while(digitalRead(btn_start) == LOW){                 //  effetto dissolvenza del led
+    for (int i = 0; i <= 255; i++){                     //  accensione
+      analogWrite(led_esito, i);
+      delay(5);
+    }
+    for (int i = 255; i >= 0; i--){                     //  spegnimento
+      analogWrite(led_esito, i);
+      delay(5);
+    }
+  }
 }
 
 int conteggioTempo(int pin, int button, int linea, String test){
-  delay(random(1000, 5000));                    //  aspetto il tempo random ed accendo il led / buzzer
-  digitalWrite(pin, HIGH);
-  int ris = 0;
-  while (digitalRead(button) == LOW){           //  while che calcola il tempo di reazione aumentando di 1 ogni millisecondo
-    ris++;
-    delay(1);
-  }
-  lcd.setCursor(0, linea);
-  lcd.print(test + String(ris) + "ms");
-  digitalWrite(pin, LOW);                       //  stampo il risultato e spengo il led / buzzer
-  return ris;
+    delay(random(1000, 5000));                    //  aspetto il tempo random ed accendo il led / buzzer
+    digitalWrite(pin, HIGH);
+    int ris = 0;
+    while (digitalRead(button) == LOW){           //  while che calcola il tempo di reazione aumentando di 1 ogni millisecondo
+      ris++;
+      delay(1);
+    }
+    lcd.setCursor(0, linea);
+    lcd.print(test + String(ris) + "ms");
+    digitalWrite(pin, LOW);                       //  stampo il risultato e spengo il led / buzzer
+    return ris;
 }
