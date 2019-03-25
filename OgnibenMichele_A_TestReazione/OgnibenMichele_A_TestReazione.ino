@@ -18,6 +18,7 @@ int led_esito;
 
 void setup() {
   lcd.begin(16, 2); 
+  lcd.print("Inizia");
                     //  pin
   led_blu    = 1;
   beep       = 2;
@@ -72,12 +73,18 @@ void loop() {
   
   while(digitalRead(btn_start) == LOW){                 //  effetto dissolvenza del led
     for (int i = 0; i <= 255; i++){                     //  accensione
+      if (digitalRead(btn_start) == HIGH){
+        break;
+      }
       analogWrite(led_esito, i);
-      delay(5);
+      delay(6);
     }
     for (int i = 255; i >= 0; i--){                     //  spegnimento
+      if (digitalRead(btn_start) == HIGH){
+        break;
+      }
       analogWrite(led_esito, i);
-      delay(5);
+      delay(6);
     }
   }
 }
