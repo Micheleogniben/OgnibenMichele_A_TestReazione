@@ -14,7 +14,7 @@ int beep;
 int ris1;
 int ris2;
 int tempo_max;
-int led_esito;
+int led;
 
 void setup() {
   lcd.begin(16, 2); 
@@ -29,8 +29,6 @@ void setup() {
   btn_beep   = 7;
                     //  variabili
   tempo_max  = 500;
-  ris1       = -1;
-  ris2       = -1;
   
   pinMode(btn_start,  INPUT);
   pinMode(btn_led,    INPUT);
@@ -44,46 +42,40 @@ void setup() {
 
 void loop() {
   
-  while (digitalRead(btn_start) == LOW) {};     //  non inizierà nulla fino a che non verrà premuto il bottone
-                                                //  metodi per il calcolo del tempo di reazione per led e buzzer
+  while (digitalRead(btn_start) == LOW) {};       //  non inizierà nulla fino a che non verrà premuto il bottone
+                                                  //  metodi per il calcolo del tempo di reazione per led e buzzer
   digitalWrite(led_verde, LOW);
   digitalWrite(led_rosso, LOW);
   lcd.clear();
+  led = led_rosso;
   
   ris1 = conteggioTempo(led_blu, btn_led,  0, "Led: ");
   
-  if (ris1 < 100){                              //  primo test non valido perchè l'utente ha "barato"
+  if (ris1 < 100){                                //  se il primo test non valido perchè l'utente ha "barato"
     lcd.clear();
     lcd.print("Test non valido");
-    led_esito = led_rosso;
   }else{
     ris2 = conteggioTempo(beep, btn_beep, 1, "Suono: ");
-    if (ris2 < 100){                            //  secondo test non valido perchè l'utente ha "barato"
+    
+    if (ris2 < 100){                              //  se il secondo test non valido perchè l'utente ha "barato"
       lcd.clear();
       lcd.print("Test non valido");
-      led_esito = led_rosso;
-    }else{
+    }else{                                        //  test valido, ora controllo se l'utente ha superato le prove
       if (ris1 <= tempo_max && ris2 <= tempo_max){
-        led_esito = led_verde;                                //  test passato     => Led Verde
-      }else{
-        led_esito = led_rosso;                                //  test non passato => Led Rosso
+        led = led_verde;                          //  test passato     => Led Verde
       }
     }
   }
   
-  while(digitalRead(btn_start) == LOW){                 //  effetto dissolvenza del led
-    for (int i = 0; i <= 255; i++){                     //  accensione
-      if (digitalRead(btn_start) == HIGH){
-        break;
-      }
-      analogWrite(led_esito, i);
+  while(digitalRead(btn_start) == LOW){           //  effetto dissolvenza del led
+    for (int i = 0; i <= 255; i++){
+      if (digitalRead(btn_start) == HIGH){ break; }
+      analogWrite(led, i);
       delay(6);
     }
-    for (int i = 255; i >= 0; i--){                     //  spegnimento
-      if (digitalRead(btn_start) == HIGH){
-        break;
-      }
-      analogWrite(led_esito, i);
+    for (int i = 255; i >= 0; i--){
+      if (digitalRead(btn_start) == HIGH){ break; }
+      analogWrite(led, i);
       delay(6);
     }
   }
