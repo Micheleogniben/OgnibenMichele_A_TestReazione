@@ -18,7 +18,6 @@ int led;
 
 void setup() {
   lcd.begin(16, 2); 
-  lcd.print("Inizia");
                     //  pin
   led_blu    = 1;
   beep       = 2;
@@ -42,11 +41,13 @@ void setup() {
 
 void loop() {
   
+  lcd.clear();
+  lcd.print("Inizia");
+  delay(300);
   while (digitalRead(btn_start) == LOW) {};       //  non inizierà nulla fino a che non verrà premuto il bottone
                                                   //  metodi per il calcolo del tempo di reazione per led e buzzer
-  digitalWrite(led_verde, LOW);
-  digitalWrite(led_rosso, LOW);
   lcd.clear();
+  lcd.print("Test iniziato");
   led = led_rosso;
   
   ris1 = conteggioTempo(led_blu, btn_led,  0, "Led: ");
@@ -56,7 +57,6 @@ void loop() {
     lcd.print("Test non valido");
   }else{
     ris2 = conteggioTempo(beep, btn_beep, 1, "Suono: ");
-    
     if (ris2 < 100){                              //  se il secondo test non valido perchè l'utente ha "barato"
       lcd.clear();
       lcd.print("Test non valido");
@@ -79,6 +79,10 @@ void loop() {
       delay(6);
     }
   }
+                                                  //  il bottone deve essere premuto per continuare
+  while (digitalRead(btn_start) == LOW) {};
+  digitalWrite(led_verde, LOW);
+  digitalWrite(led_rosso, LOW);
 }
 
 int conteggioTempo(int pin, int button, int linea, String test){
@@ -90,7 +94,8 @@ int conteggioTempo(int pin, int button, int linea, String test){
       delay(1);
     }
     lcd.setCursor(0, linea);
-    lcd.print(test + String(ris) + "ms");
+    lcd.print(test + String(ris) + "ms       ");
     digitalWrite(pin, LOW);                       //  stampo il risultato e spengo il led / buzzer
     return ris;
 }
+
